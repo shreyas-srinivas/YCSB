@@ -87,7 +87,7 @@ public class CoreWorkload extends Workload {
    * Default number of fields in a record.
    */
   public static final String FIELD_COUNT_PROPERTY_DEFAULT = "10";
-  
+
   private List<String> fieldnames;
 
   /**
@@ -356,6 +356,7 @@ public class CoreWorkload extends Workload {
   protected DiscreteGenerator operationchooser;
   protected NumberGenerator keychooser;
   protected NumberGenerator fieldchooser;
+  protected RandomFieldSelectGenerator fieldselector;
   protected AcknowledgedCounterGenerator transactioninsertkeysequence;
   protected NumberGenerator scanlength;
   protected boolean orderedinserts;
@@ -512,6 +513,7 @@ public class CoreWorkload extends Workload {
     }
 
     fieldchooser = new UniformLongGenerator(0, fieldcount - 1);
+    fieldselector = new RandomFieldSelectGenerator();
 
     if (scanlengthdistrib.compareTo("uniform") == 0) {
       scanlength = new UniformLongGenerator(minscanlength, maxscanlength);
@@ -724,11 +726,11 @@ public class CoreWorkload extends Workload {
     if (!readallfields) {
       // read a random field
       fields = new HashSet<String>();
+      int[] f = fieldselector.getFields(0, (int) fieldcount, readfieldcount);
       for (int i = 0; i < readfieldcount; i++) {
-        String fieldname = fieldnames.get(fieldchooser.nextValue().intValue());
+        String fieldname = fieldnames.get(f[i]);
         fields.add(fieldname);
       }
-
     } else if (dataintegrity) {
       // pass the full field list if dataintegrity is on for verification
       fields = new HashSet<String>(fieldnames);
