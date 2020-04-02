@@ -157,7 +157,6 @@ LICENSE file.
     <!-- our internals -->
     <module>core</module>
     <module>binding-parent</module>
-    <module>distribution</module>
     <!-- all the datastore bindings, lex sorted please -->
     <module>mongodb</module>
   </modules>
