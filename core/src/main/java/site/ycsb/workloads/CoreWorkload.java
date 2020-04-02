@@ -155,6 +155,17 @@ public class CoreWorkload extends Workload {
 
   protected boolean readallfields;
 
+  protected int readfieldcount;
+
+  /**
+   * The name of the property for the min scan length (number of records).
+   */
+  public static final String READ_FIELD_COUNT_PROPERTY = "readfieldcount";
+
+  /**
+   * The default min scan length.
+   */
+  public static final String READ_FIELD_COUNT_PROPERTY_DEFAULT = "1";
   /**
    * The name of the property for deciding whether to write one field (false) or all fields (true)
    * of a record.
@@ -432,6 +443,9 @@ public class CoreWorkload extends Workload {
 
     readallfields = Boolean.parseBoolean(
         p.getProperty(READ_ALL_FIELDS_PROPERTY, READ_ALL_FIELDS_PROPERTY_DEFAULT));
+
+    readfieldcount = Integer.parseInt(p.getProperty(READ_FIELD_COUNT_PROPERTY, READ_FIELD_COUNT_PROPERTY_DEFAULT));
+
     writeallfields = Boolean.parseBoolean(
         p.getProperty(WRITE_ALL_FIELDS_PROPERTY, WRITE_ALL_FIELDS_PROPERTY_DEFAULT));
 
@@ -709,10 +723,12 @@ public class CoreWorkload extends Workload {
 
     if (!readallfields) {
       // read a random field
-      String fieldname = fieldnames.get(fieldchooser.nextValue().intValue());
-
       fields = new HashSet<String>();
-      fields.add(fieldname);
+      for (int i = 0; i < readfieldcount; i++) {
+        String fieldname = fieldnames.get(fieldchooser.nextValue().intValue());
+        fields.add(fieldname);
+      }
+
     } else if (dataintegrity) {
       // pass the full field list if dataintegrity is on for verification
       fields = new HashSet<String>(fieldnames);
